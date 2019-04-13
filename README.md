@@ -1,2 +1,2 @@
 # Opiniter
-DefHacks Project
+DefHacks Project: Real-time opinion analysis.
