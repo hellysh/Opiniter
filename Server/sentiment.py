@@ -14,20 +14,17 @@ def print_result(annotations):
 
     print('Overall Sentiment: score of {} with magnitude of {}'.format(
         score, magnitude))
+    print(dir(annotations.language))
     return 0
 
 
-# converts a score + magnitude to a normalized score in the range [0,4]
-def get_sentiment(score, magnitude):
-    if magnitude > 10:
-        magnitude = 10  # cap magnitude at a certain value
+# converts the score of an annotation to the range [0,4]
+def get_sentiment(annotations):
+    score = annotations.document_sentiment.score
+    # magnitude = annotations.document_sentiment.magnitude
 
-    # normalize score from [0,1] to [-0.5, 0.5]
-    score -= 0.5
-
-    # we calculate the sentiment by simply multiplying the two values together
-    val = score * magnitude
-    return (val + 5) * (2/5)
+    # we assume score takes values from [-1, 1]
+    return (score * 2) + 2
 
 
 # analyzes a single tweet and returns a sentiment annotation
@@ -44,4 +41,4 @@ if __name__ == '__main__':
     # initialize the Google Language Client
     client = language.LanguageServiceClient()
 
-    print_result(analyze("I love the taste of McDonalds!"))
+    print_result(analyze("I love SpaceX rockets!"))
