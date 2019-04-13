@@ -201,7 +201,7 @@ function realTimeChart() {
 
     // update axis with modified scale
     xAxis.scale(x)(xAxisG);
-    yAxis.scale(y)(yAxisG);
+    yAxis.scale(y).tickValues([0, 1, 2, 3, 4])(yAxisG);
     xAxisNav.scale(xNav)(xAxisGNav);
 
     // create brush (moveable, changable rectangle that determines 
