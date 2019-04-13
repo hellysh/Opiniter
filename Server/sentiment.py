@@ -18,13 +18,16 @@ def print_result(annotations):
     return 0
 
 
-# converts the score of an annotation to the range [0,4]
+# converts the score of an annotation to the range [0,100]
 def get_sentiment(annotations):
     score = annotations.document_sentiment.score
     # magnitude = annotations.document_sentiment.magnitude
 
+    if score < -1.0 or score > 1.0:
+        print("score out of range! score = ", str(score))
+
     # we assume score takes values from [-1, 1]
-    return (score * 2) + 2
+    return (score + 1) * 50
 
 
 # analyzes a single tweet and returns a sentiment annotation
