@@ -82,16 +82,6 @@
 var meanMs = 1000, // milliseconds
     dev = 150;
 
-
-// get current time 
-var currentTime = new Date(),
-  hours = currentTime.getHours(),
-  minutes = currentTime.getMinutes();
-
-if (minutes < 10) {
-    minutes = "0" + minutes;
-}
-
 // define time scale
 var timeScale = d3.scale.linear()
     .domain([300, 1700])
@@ -105,7 +95,8 @@ var valueScale = d3.scale.linear()
 
 // generate initial data
 var normal = d3.random.normal(1000, 150);
-var currMs = new Date().getTime() - 300000 - 4000;
+//var currMs = new Date().getTime() - 300000 - 4000;
+var currMs = new Date().getTime();
 var data = d3.range(300).map(function(d, i, arr) {
   var value = valueScale(Math.random()); // random data
   //var value = Math.round((d % 60) / 60 * 95); // ramp data
