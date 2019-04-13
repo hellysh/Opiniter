@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -81,6 +81,16 @@
 // mean and deviation for time interval
 var meanMs = 1000, // milliseconds
     dev = 150;
+
+
+// get current time 
+var currentTime = new Date(),
+  hours = currentTime.getHours(),
+  minutes = currentTime.getMinutes();
+
+if (minutes < 10) {
+    minutes = "0" + minutes;
+}
 
 // define time scale
 var timeScale = d3.scale.linear()
