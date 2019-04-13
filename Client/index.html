@@ -49,14 +49,24 @@
   .well {
     padding-top: 0px;
     padding-bottom: 0px;
+    text-align: center;
+  }
+
+  #viewdiv {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
   }
   </style>
 <body>
 
-<div style="max-width: 600px; max-height: 400px; padding: 10px">
+<div style="padding: 10px">
 
   <div class="well">
-    <h4>D3 Based Real Time Chart 
+    <h4>Opiniter 
   </div>
 
   <div id="viewDiv"></div>
@@ -81,7 +91,7 @@ var timeScale = d3.scale.linear()
 // define value scale
 var valueScale = d3.scale.linear()
     .domain([0, 1])
-    .range([30, 95]);
+    .range([0, 4]);
 
 // generate initial data
 var normal = d3.random.normal(1000, 150);
@@ -96,14 +106,18 @@ var data = d3.range(300).map(function(d, i, arr) {
   return obj;
 })
 
+var viewDiv = document.getElementById("viewDiv");
+var width = viewDiv.clientWidth;
+var height = viewDiv.clientHeight;
+
 // create the real time chart
 var chart = realTimeChart()
-    .title("Chart Title")
-    .yTitle("Y Scale")
-    .xTitle("X Scale")
+    .title("Real-time Sentiment Analysis")
+    .yTitle("Sentiment")
+    .xTitle("Current Time")
     .border(true)
-    .width(600)
-    .height(290)
+    .width(width)
+    .height(650)
     .barWidth(1)
     .initialData(data);
 
