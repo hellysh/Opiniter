@@ -5,7 +5,10 @@ from google.cloud.language import types
 import requests
 from requests_oauthlib import OAuth1
 
+import re
 
+
+# returns [(string, fav_count, retweet_count), (), ...]
 def twittertest():
     # https://stackoverflow.com/questions/33308634/how-to-perform-oauth-when-doing-twitter-scraping-with-python-requests
     # https://github.com/requests/requests-oauthlib
@@ -19,7 +22,25 @@ def twittertest():
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     auth_req = requests.get(url, auth=auth)
 
-    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=popular', auth=auth)
+    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=popular&tweet_mode=extended', auth=auth)
+
+    js = r.json()
+
+    result = []
+
+    for stuff in js['statuses']:
+        if stuff['lang'] == 'en':
+
+            # get rid of the https
+            clean_string = re.sub(r'http(.*)', ' ', stuff['full_text'])
+
+            # get rid of emojis
+            clean_string = clean_string.encode('ascii', 'ignore').decode('ascii')
+
+            result.append((clean_string, stuff['favorite_count'], stuff['retweet_count']))
+
+    return result
+
 
 def print_result(annotations):
     score = annotations.document_sentiment.score
@@ -63,5 +84,5 @@ if __name__ == '__main__':
     # initialize the Google Language Client
     client = language.LanguageServiceClient()
 
-    print_result(analyze("I love SpaceX rockets!"))
+    #print_result(analyze("I love SpaceX rockets!"))
     twittertest()
