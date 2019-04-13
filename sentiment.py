@@ -17,30 +17,31 @@ def print_result(annotations):
     return 0
 
 
-def analyze(movie_review_filename):
-    """Run a sentiment analysis request on text within a passed filename."""
-    client = language.LanguageServiceClient()
+# converts a score + magnitude to a normalized score in the range [0,4]
+def get_sentiment(score, magnitude):
+    if magnitude > 10:
+        magnitude = 10  # cap magnitude at a certain value
 
-    with open(movie_review_filename, 'r') as review_file:
-        # Instantiates a plain text document.
-        content = review_file.read()
+    # normalize score from [0,1] to [-0.5, 0.5]
+    score -= 0.5
 
+    # we calculate the sentiment by simply multiplying the two values together
+    val = score * magnitude
+    return (val + 5) * (2/5)
+
+
+# analyzes a single tweet and returns a sentiment annotation
+def analyze(tweet):
     document = types.Document(
-        content=content,
+        content=tweet,
         type=enums.Document.Type.PLAIN_TEXT)
     annotations = client.analyze_sentiment(document=document)
 
-    # Print the results
-    print_result(annotations)
+    return annotations
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument(
-        'movie_review_filename',
-        help='The filename of the movie review you\'d like to analyze.')
-    args = parser.parse_args()
+    # initialize the Google Language Client
+    client = language.LanguageServiceClient()
 
-    analyze(args.movie_review_filename)
+    print_result(analyze("I love the taste of McDonalds!"))
