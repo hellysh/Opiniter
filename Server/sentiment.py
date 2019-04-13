@@ -12,17 +12,14 @@ def twittertest():
 
     API_KEY = "BBO3tycDktTQ51cqndzjPwCAl"
     API_SECRET = "IWiHqv6zPqPsRRKxPHqSuO8PhVOxaoq8c93jkMBz9vYNH0JEbb"
-    ACCESS_TOKEN = "IWiHqv6zPqPsRRKxPHqSuO8PhVOxaoq8c93jkMBz9vYNH0JEbb"
+    ACCESS_TOKEN = "1058588036487757825-xxEE0y8rUu3K5U7FeDP3dOTBAQB68K"
     ACCESS_TOKEN_SECRET = "Cg7kLAGROGbIq9J57b0VSp9AjjDP2NfJ6Cxxxn1FEB2Jr"
 
     url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     auth_req = requests.get(url, auth=auth)
 
-    print(auth_req)
-
     r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=popular', auth=auth)
-    print(r)
 
 def print_result(annotations):
     score = annotations.document_sentiment.score
@@ -66,5 +63,5 @@ if __name__ == '__main__':
     # initialize the Google Language Client
     client = language.LanguageServiceClient()
 
-    # print_result(analyze("I love SpaceX rockets!"))
+    print_result(analyze("I love SpaceX rockets!"))
     twittertest()
