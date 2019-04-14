@@ -1,4 +1,4 @@
-# OPIONIORATED
+# OPINIONRATED
 DefHacks Project: Real-time opinion analysis.
 
 CREDITS:
