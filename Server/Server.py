@@ -8,10 +8,6 @@ app = flask.Flask(__name__)
 
 
 @app.route('/', methods=['GET'])
-def home():
-    return "hello server"
-
-@app.route('/getCurrCompanyStock', methods=['GET'])
 def get_curr_company_stock():
     company = flask.request.args.get('company', default='Apple Inc.', type=str)
     print(company, full_to_short[company])
