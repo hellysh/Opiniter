@@ -10,12 +10,9 @@ import re
 from datetime import datetime
 from pytz import timezone
 
+import time
 
-# returns [(string, fav_count, retweet_count, timestamp), (), ...]
-def twittertest(query="Apple"):
-    # https://stackoverflow.com/questions/33308634/how-to-perform-oauth-when-doing-twitter-scraping-with-python-requests
-    # https://github.com/requests/requests-oauthlib
-
+def init_twitter():
     API_KEY = "BBO3tycDktTQ51cqndzjPwCAl"
     API_SECRET = "IWiHqv6zPqPsRRKxPHqSuO8PhVOxaoq8c93jkMBz9vYNH0JEbb"
     ACCESS_TOKEN = "1058588036487757825-xxEE0y8rUu3K5U7FeDP3dOTBAQB68K"
@@ -24,8 +21,15 @@ def twittertest(query="Apple"):
     url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     auth_req = requests.get(url, auth=auth)
+    return auth
 
-    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q={}&result_type=recent&tweet_mode=extended&lang=en&count=75'.format(query), auth=auth)
+
+# returns [(string, fav_count, retweet_count, timestamp), (), ...]
+def twittertest(auth, query="Apple"):
+    # https://stackoverflow.com/questions/33308634/how-to-perform-oauth-when-doing-twitter-scraping-with-python-requests
+    # https://github.com/requests/requests-oauthlib
+
+    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q={}&result_type=recent&tweet_mode=extended&lang=en&count=50'.format(query), auth=auth)
 
     js = r.json()
 
@@ -60,13 +64,11 @@ def print_result(annotations):
 
     for index, sentence in enumerate(annotations.sentences):
         sentence_sentiment = sentence.sentiment.score
-        print('Sentence {} has a sentiment score of {}'.format(
-            index, sentence_sentiment))
+        #print('Sentence {} has a sentiment score of {}'.format(index, sentence_sentiment))
 
-    print('Overall Sentiment: score of {} with magnitude of {}'.format(
-        score, magnitude))
+    #print('Overall Sentiment: score of {} with magnitude of {}'.format(score, magnitude))
 
-    print("sentiment score = ", get_sentiment(annotations))
+    #print("sentiment score = ", get_sentiment(annotations))
     return 0
 
 
@@ -78,16 +80,17 @@ def get_sentiment(annotations, likes, rt, n=4):
     if score < -1.0 or score > 1.0:
         print("score out of range! score = ", str(score))
 
-    weight = likes + rt
-    if weight > 100:
-        weight = 100
-    elif weight <= 0:
-        weight = 1
-
-    score *= weight
-
-    # we assume score takes values from [-1, 1]
-    return (score + 100) * n/200
+    # weight = likes + rt
+    # if weight > 100:
+    #     weight = 100
+    # elif weight <= 0:
+    #     weight = 1
+    #
+    # score *= weight
+    #
+    # # we assume score takes values from [-1, 1]
+    # return (score + 100) * n/200
+    return (score + 1) * n/2
 
 
 # analyzes a single tweet and returns a sentiment annotation
@@ -106,10 +109,10 @@ def get_avg_sentiment(tweets):
     total_sentiment = 0
 
     for tweet in tweets:
-        print(tweet[0])
+        #print(tweet[0])
         annotations = analyze(tweet[0])
         curr_sentiment = get_sentiment(annotations, tweet[1], tweet[2])
-        print("sentiment of", curr_sentiment, "\n")
+        #print("sentiment of", curr_sentiment, "\n")
         total_sentiment += curr_sentiment
 
     return total_sentiment / num_tweets
@@ -118,8 +121,12 @@ def get_avg_sentiment(tweets):
 if __name__ == '__main__':
     # initialize the Google Language Client
     client = language.LanguageServiceClient()
+    auth = init_twitter()
 
     # print_result(analyze("I love SpaceX rockets!"))
-    tweets = twittertest()
-    print()
+    #while True:
+    tweets = twittertest(auth)
+    print(tweets[0][3])
     print("average sentiment = ", get_avg_sentiment(tweets))
+    print()
+        #time.sleep(10)
