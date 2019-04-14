@@ -171,13 +171,13 @@ function realTimeChart() {
 
     // define function that will draw the nav area chart
     var navArea = d3.svg.area()
-        .x(function (d) { return xNav(d.time); })
+        .x(function (d) { return x(d.time); })
         .y1(function (d) { return yNav(d.value); })
         .y0(heightNav);
 
     // define function that will draw the nav line chart
     var navLine = d3.svg.line()
-        .x(function (d) { return xNav(d.time); })
+        .x(function (d) { return x(d.time); })
         .y(function (d) { return yNav(d.value); });
 
     // compute initial time domains...
@@ -342,7 +342,7 @@ function realTimeChart() {
 
       // update axis
       xAxis.scale(x)(xAxisG);
-      xAxisNav.scale(xNav)(xAxisGNav);
+      xAxisNav.scale(x)(xAxisGNav);
 
       // refresh svg
       refresh();
