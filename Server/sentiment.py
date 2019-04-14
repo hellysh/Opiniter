@@ -12,7 +12,7 @@ from pytz import timezone
 
 
 # returns [(string, fav_count, retweet_count, timestamp), (), ...]
-def twittertest():
+def twittertest(query="Apple"):
     # https://stackoverflow.com/questions/33308634/how-to-perform-oauth-when-doing-twitter-scraping-with-python-requests
     # https://github.com/requests/requests-oauthlib
 
@@ -25,7 +25,7 @@ def twittertest():
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     auth_req = requests.get(url, auth=auth)
 
-    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=recent&tweet_mode=extended&lang=en', auth=auth)
+    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q={}&result_type=recent&tweet_mode=extended&lang=en&count=75'.format(query), auth=auth)
 
     js = r.json()
 
@@ -40,16 +40,11 @@ def twittertest():
 
         timestamp = datetime.strptime(stuff['created_at'], '%a %b %d %H:%M:%S %z %Y')
 
-        result.append((clean_string,
-                       stuff['favorite_count'],
-                       stuff['retweet_count'],
-                       timestamp))
-
-        print(clean_string)
-        print(timestamp)
-        print(change_timezone(timestamp))
-
-        print()
+        if not clean_string.startswith("RT"):
+            result.append((clean_string,
+                           stuff['favorite_count'],
+                           stuff['retweet_count'],
+                           timestamp))
 
     return result
 
@@ -76,30 +71,55 @@ def print_result(annotations):
 
 
 # converts the score of an annotation to the range [0,n]
-def get_sentiment(annotations, n=4):
+def get_sentiment(annotations, likes, rt, n=4):
     score = annotations.document_sentiment.score
     # magnitude = annotations.document_sentiment.magnitude
 
     if score < -1.0 or score > 1.0:
         print("score out of range! score = ", str(score))
 
+    weight = likes + rt
+    if weight > 100:
+        weight = 100
+    elif weight <= 0:
+        weight = 1
+
+    score *= weight
+
     # we assume score takes values from [-1, 1]
-    return (score + 1) * n/2
+    return (score + 100) * n/200
 
 
 # analyzes a single tweet and returns a sentiment annotation
-def analyze(tweet):
+def analyze(tweet_text):
     document = types.Document(
-        content=tweet,
+        content=tweet_text,
         type=enums.Document.Type.PLAIN_TEXT)
     annotations = client.analyze_sentiment(document=document)
 
     return annotations
 
 
+# returns an average sentiment from the given tweets
+def get_avg_sentiment(tweets):
+    num_tweets = len(tweets)
+    total_sentiment = 0
+
+    for tweet in tweets:
+        print(tweet[0])
+        annotations = analyze(tweet[0])
+        curr_sentiment = get_sentiment(annotations, tweet[1], tweet[2])
+        print("sentiment of", curr_sentiment, "\n")
+        total_sentiment += curr_sentiment
+
+    return total_sentiment / num_tweets
+
+
 if __name__ == '__main__':
     # initialize the Google Language Client
     client = language.LanguageServiceClient()
 
-    #print_result(analyze("I love SpaceX rockets!"))
-    twittertest()
+    # print_result(analyze("I love SpaceX rockets!"))
+    tweets = twittertest()
+    print()
+    print("average sentiment = ", get_avg_sentiment(tweets))
