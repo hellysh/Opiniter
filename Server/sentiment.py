@@ -124,9 +124,9 @@ if __name__ == '__main__':
     auth = init_twitter()
 
     # print_result(analyze("I love SpaceX rockets!"))
-    while True:
-        tweets = twittertest(auth)
-        print(tweets[0][3])
-        print("average sentiment = ", get_avg_sentiment(tweets))
-        print()
-        time.sleep(10)
+    #while True:
+    tweets = twittertest(auth)
+    print(tweets[0][3])
+    print("average sentiment = ", get_avg_sentiment(tweets))
+    print()
+        #time.sleep(10)
