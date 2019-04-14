@@ -76,6 +76,8 @@
     position: relative;
     display: inline-block;
     padding: 10px;
+    margin: auto;
+    align-content: center;
   }
 
   #myInput {
@@ -97,16 +99,23 @@
     width: 100%;
   }
 
-  input[type=submit] {
-    background-color: grey;
-    color: #fff;
+  #button {
+    border: none;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 20px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
     cursor: pointer;
+    background-color: #e7e7e7;
+    color: black;
+    border: 2px solid lightgrey;
   }
 
-  #button {
-    margin-left: 15px;
-    padding: 11px;
-  }
+  #button:hover {background-color: lightgrey;}
 
   .autocomplete-items {
     position: absolute;
@@ -114,6 +123,9 @@
     border-bottom: none;
     border-top: none;
     z-index: 99;
+    margin: auto;
+    align-content: center;
+    width: 100%;
     /*position the autocomplete items to be the same width as the container:*/
   }
 
@@ -149,9 +161,9 @@
 <!--Make sure the form has the autocomplete function switched off:-->
 <form autocomplete="off" action="/action_page.php">
   <div class="autocomplete" style="width:300px;">
-  <input id="myInput" type="text" name="Company" placeholder="Microsoft">
+  <input id="myInput" type="text" name="Company" placeholder="Microsoft Corp.">
   </div>
-  <input id = "button" type="submit">
+  <input id = "button" type = "button" value="Submit">
 </form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
@@ -179,6 +191,7 @@ var valueScale = d3.scale.linear()
 var normal = d3.random.normal(1000, 150);
 //var currMs = new Date().getTime() - 300000 - 4000;
 var currMs = new Date().getTime();
+var company = 'Microsoft Corp.'
 var data = d3.range(300).map(function(d, i, arr) {
   var value = valueScale(Math.random()); // random data
   //var value = Math.round((d % 60) / 60 * 95); // ramp data
@@ -222,6 +235,9 @@ var chartDiv = d3.select("#viewDiv").append("div")
 // in a normal use case, real time data would arrive through the network or some other mechanism
 var d = 0;
 function dataGenerator() {
+
+  var company = document.getElementById("myInput").value
+  var input = company === "" ? "Microsoft Corp." : company
 
   var timeout = Math.round(timeScale(normal()));
 
