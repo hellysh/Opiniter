@@ -8,10 +8,6 @@ app = flask.Flask(__name__)
 
 
 @app.route('/', methods=['GET'])
-def home():
-    return "hello server"
-
-@app.route('/getCurrCompanyStock', methods=['GET'])
 def get_curr_company_stock():
     company = flask.request.args.get('company', default='Apple Inc.', type=str)
     print(company, full_to_short[company])
@@ -20,8 +16,8 @@ def get_curr_company_stock():
     print('tweets = ' + company.split(' ', 1)[0])
 
     return flask.jsonify(
-        stock=CompanyStockAPI.get_realtime_company_stock_api(full_to_short[company]),
-        sentiment=sentiment.get_avg_sentiment(client, tweets)
+        stock=float(CompanyStockAPI.get_realtime_company_stock_api(full_to_short[company])),
+        sentiment=float(sentiment.get_avg_sentiment(client, tweets))
     )
 
 full_to_short = {}
