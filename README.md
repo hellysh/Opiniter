@@ -1,4 +1,4 @@
-# Opiniter
+# OPIONIORATED
 DefHacks Project: Real-time opinion analysis.
 
 CREDITS:
