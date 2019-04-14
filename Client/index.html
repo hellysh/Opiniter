@@ -207,16 +207,6 @@ var sentiment_data = d3.range(300).map(function(d, i, arr) {
   return obj;
 })
 
-var stock_data = d3.range(300).map(function(d, i, arr) {
-  var value = 0; // random data
-  //var value = Math.round((d % 60) / 60 * 95); // ramp data
-  var interval = 1000;
-  currMs += interval;
-  var time = new Date(currMs);
-  var obj = { interval: interval, value: value, time: time, ts: currMs }
-  return obj;
-})
-
 var viewDiv = document.getElementById("viewDiv");
 var width = viewDiv.clientWidth;
 var height = viewDiv.clientHeight;
@@ -228,19 +218,9 @@ var sentiment_chart = realTimeChart()
     .xTitle("Current Time (hh:mm)")
     .border(true)
     .width(width)
-    .height(250)
+    .height(500)
     .barWidth(1)
     .initialData(sentiment_data);
-
-var stock_chart = realTimeChart()
-    .title("Real-time Stock Value Analysis")
-    .yTitle("Stock Value")
-    .xTitle("Current Time (hh:mm)")
-    .border(true)
-    .width(width)
-    .height(250)
-    .barWidth(1)
-    .initialData(stock_data);
 
 console.log("Version: ", sentiment_chart.version);
 console.dir("Dir++");
@@ -252,18 +232,17 @@ var sentiment_chartDiv = d3.select("#viewDiv").append("div")
     .attr("id", "sentiment_chartDiv")
     .call(sentiment_chart);
 
-var stock_chartDiv = d3.select("#viewDiv").append("div")
-    .attr("id", "stock_chartDiv")
-    .call(stock_chart);
-
 var d = 0;
 function data_generator() {
   var company = document.getElementById("myInput").value
-  console.log(company.length)
   var input = company.length === 0 ? "Microsoft Corp." : company
   input = input.replace(/ /g, '%20')
 
-  var timeout = 1000;
+  var timeout = 5000;
+
+  d3.select("#button").on("click", function() {
+    d++;
+  })
 
   setTimeout(function() {
     var xmlHttp = new XMLHttpRequest();
@@ -272,9 +251,8 @@ function data_generator() {
     xmlHttp.onreadystatechange = function() {
       if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
         var response = xmlHttp.response;
-        console.log(response);
         // create new data item
-        update_values(JSON.parse(response))
+        update_values(JSON.parse(response), d)
       }
     }
     xmlHttp.setRequestHeader("Content-Type", "application/json");
@@ -286,31 +264,22 @@ function data_generator() {
 }
 data_generator();
 
-function update_values(response) {
+function update_values(response, d) {
     console.log(response);
-    var timeout = Math.round(timeScale(normal()));
+    console.log(d);
+    var timeout = 5000;
     var now = new Date();
     var sentiment_obj = {
       value: response["sentiment"], // random data
       //value: Math.round((d++ % 60) / 60 * 95), // ramp data
       time: now,
-      color: "red",
-      ts: now.getTime(),
-      interval: timeout
-    };
-
-    var stock_obj = {
-      value: response["stock"] / 100.0, // random data
-      //value: Math.round((d++ % 60) / 60 * 95), // ramp data
-      time: now,
-      color: "red",
+      color: d % 2 === 0 ? "red" : "blue",
       ts: now.getTime(),
       interval: timeout
     };
 
     // send the datum to the chart
     sentiment_chart.datum(sentiment_obj);
-    stock_chart.datum(stock_obj)
 }
 
 </script>
