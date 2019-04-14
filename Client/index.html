@@ -196,8 +196,9 @@ var normal = d3.random.normal(1000, 150);
 //var currMs = new Date().getTime() - 300000 - 4000;
 var currMs = new Date().getTime();
 var company = 'Microsoft Corp.'
+
 var sentiment_data = d3.range(300).map(function(d, i, arr) {
-  var value = valueScale(Math.random()); // random data
+  var value = 0; // random data
   //var value = Math.round((d % 60) / 60 * 95); // ramp data
   var interval = Math.round(timeScale(normal()));
   currMs += interval;
@@ -207,7 +208,7 @@ var sentiment_data = d3.range(300).map(function(d, i, arr) {
 })
 
 var stock_data = d3.range(300).map(function(d, i, arr) {
-  var value = valueScale(Math.random()); // random data
+  var value = 0; // random data
   //var value = Math.round((d % 60) / 60 * 95); // ramp data
   var interval = Math.round(timeScale(normal()));
   currMs += interval;
@@ -255,53 +256,52 @@ var stock_chartDiv = d3.select("#viewDiv").append("div")
     .attr("id", "stock_chartDiv")
     .call(stock_chart);
 
-// alternative invocation
-//chart(chartDiv); 
-
-
-// drive data into the chart roughly every second
-// in a normal use case, real time data would arrive through the network or some other mechanism
 var d = 0;
-function dataGenerator() {
-
+function data_generator() {
   var company = document.getElementById("myInput").value
-  var input = company === "" ? "Microsoft Corp." : company
+  var input = company === "" ? "Microsoft%20Corp." : company
 
   var timeout = Math.round(timeScale(normal()));
 
   setTimeout(function() {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", "http://127.0.0.1:5000/?company=Microsoft%20Corp.", true ); // false for synchronous request
+    xmlHttp.onreadystatechange = function() {
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        var response = xmlHttp.response;
+        console.log(response);
+        // create new data item
+        var now = new Date();
+        var sentiment_obj = {
+          value: response["sentiment"], // random data
+          //value: Math.round((d++ % 60) / 60 * 95), // ramp data
+          time: now,
+          color: "red",
+          ts: now.getTime(),
+          interval: timeout
+        };
 
-    // create new data item
-    var now = new Date();
-    var sentiment_obj = {
-      value: valueScale(Math.random()), // random data
-      //value: Math.round((d++ % 60) / 60 * 95), // ramp data
-      time: now,
-      color: "red",
-      ts: now.getTime(),
-      interval: timeout
-    };
+        var stock_obj = {
+          value: response["stock"], // random data
+          //value: Math.round((d++ % 60) / 60 * 95), // ramp data
+          time: now,
+          color: "red",
+          ts: now.getTime(),
+          interval: timeout
+        };
 
-    var stock_obj = {
-      value: valueScale(Math.random()), // random data
-      //value: Math.round((d++ % 60) / 60 * 95), // ramp data
-      time: now,
-      color: "red",
-      ts: now.getTime(),
-      interval: timeout
-    };
-
-    // send the datum to the chart
-    sentiment_chart.datum(sentiment_obj);
-    stock_chart.datum(stock_obj)
-
+        // send the datum to the chart
+        sentiment_chart.datum(sentiment_obj);
+        stock_chart.datum(stock_obj)
+      }
+    }
+    xmlHttp.setRequestHeader("Content-Type", "application/json");
+    xmlHttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+    xmlHttp.send( null ); 
     // do forever
-    dataGenerator();
-
+    data_generator();
   }, timeout);
 }
-
-// start the data generator
-dataGenerator();
+data_generator();
 
 </script>
