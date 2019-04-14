@@ -94,7 +94,7 @@ def get_sentiment(annotations, likes, rt, n=4):
 
 
 # analyzes a single tweet and returns a sentiment annotation
-def analyze(tweet_text):
+def analyze(client, tweet_text):
     document = types.Document(
         content=tweet_text,
         type=enums.Document.Type.PLAIN_TEXT)
@@ -104,13 +104,13 @@ def analyze(tweet_text):
 
 
 # returns an average sentiment from the given tweets
-def get_avg_sentiment(tweets):
+def get_avg_sentiment(client, tweets):
     num_tweets = len(tweets)
     total_sentiment = 0
 
     for tweet in tweets:
         #print(tweet[0])
-        annotations = analyze(tweet[0])
+        annotations = analyze(client, tweet[0])
         curr_sentiment = get_sentiment(annotations, tweet[1], tweet[2])
         #print("sentiment of", curr_sentiment, "\n")
         total_sentiment += curr_sentiment
