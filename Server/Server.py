@@ -16,8 +16,8 @@ def get_curr_company_stock():
     print('tweets = ' + company.split(' ', 1)[0])
 
     return flask.jsonify(
-        stock=float(CompanyStockAPI.get_realtime_company_stock_api(full_to_short[company])),
-        sentiment=sentiment.get_avg_sentiment(client, tweets)
+        stock=int(float(CompanyStockAPI.get_realtime_company_stock_api(full_to_short[company]))),
+        sentiment=int(float(sentiment.get_avg_sentiment(client, tweets)))
     )
 
 full_to_short = {}
