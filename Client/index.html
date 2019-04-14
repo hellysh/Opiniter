@@ -62,6 +62,10 @@
     overflow: hidden;
   }
 
+  #stock_chartDiv {
+    margin-top: 50px;
+  }
+
   body {
     font: 16px Arial;  
   }
@@ -192,7 +196,17 @@ var normal = d3.random.normal(1000, 150);
 //var currMs = new Date().getTime() - 300000 - 4000;
 var currMs = new Date().getTime();
 var company = 'Microsoft Corp.'
-var data = d3.range(300).map(function(d, i, arr) {
+var sentiment_data = d3.range(300).map(function(d, i, arr) {
+  var value = valueScale(Math.random()); // random data
+  //var value = Math.round((d % 60) / 60 * 95); // ramp data
+  var interval = Math.round(timeScale(normal()));
+  currMs += interval;
+  var time = new Date(currMs);
+  var obj = { interval: interval, value: value, time: time, ts: currMs }
+  return obj;
+})
+
+var stock_data = d3.range(300).map(function(d, i, arr) {
   var value = valueScale(Math.random()); // random data
   //var value = Math.round((d % 60) / 60 * 95); // ramp data
   var interval = Math.round(timeScale(normal()));
@@ -207,25 +221,39 @@ var width = viewDiv.clientWidth;
 var height = viewDiv.clientHeight;
 
 // create the real time chart
-var chart = realTimeChart()
+var sentiment_chart = realTimeChart()
     .title("Real-time Sentiment Analysis")
     .yTitle("Sentiment")
     .xTitle("Current Time (hh:mm)")
     .border(true)
     .width(width)
-    .height(500)
+    .height(250)
     .barWidth(1)
-    .initialData(data);
+    .initialData(sentiment_data);
 
-console.log("Version: ", chart.version);
+var stock_chart = realTimeChart()
+    .title("Real-time Stock Value Analysis")
+    .yTitle("Stock Value")
+    .xTitle("Current Time (hh:mm)")
+    .border(true)
+    .width(width)
+    .height(250)
+    .barWidth(1)
+    .initialData(stock_data);
+
+console.log("Version: ", sentiment_chart.version);
 console.dir("Dir++");
 console.trace();
 console.warn("warn")
 
 // invoke the chart
-var chartDiv = d3.select("#viewDiv").append("div")
-    .attr("id", "chartDiv")
-    .call(chart);
+var sentiment_chartDiv = d3.select("#viewDiv").append("div")
+    .attr("id", "sentiment_chartDiv")
+    .call(sentiment_chart);
+
+var stock_chartDiv = d3.select("#viewDiv").append("div")
+    .attr("id", "stock_chartDiv")
+    .call(stock_chart);
 
 // alternative invocation
 //chart(chartDiv); 
@@ -245,7 +273,16 @@ function dataGenerator() {
 
     // create new data item
     var now = new Date();
-    var obj = {
+    var sentiment_obj = {
+      value: valueScale(Math.random()), // random data
+      //value: Math.round((d++ % 60) / 60 * 95), // ramp data
+      time: now,
+      color: "red",
+      ts: now.getTime(),
+      interval: timeout
+    };
+
+    var stock_obj = {
       value: valueScale(Math.random()), // random data
       //value: Math.round((d++ % 60) / 60 * 95), // ramp data
       time: now,
@@ -255,7 +292,8 @@ function dataGenerator() {
     };
 
     // send the datum to the chart
-    chart.datum(obj);
+    sentiment_chart.datum(sentiment_obj);
+    stock_chart.datum(stock_obj)
 
     // do forever
     dataGenerator();
