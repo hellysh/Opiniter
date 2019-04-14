@@ -7,8 +7,11 @@ from requests_oauthlib import OAuth1
 
 import re
 
+from datetime import datetime
+from pytz import timezone
 
-# returns [(string, fav_count, retweet_count), (), ...]
+
+# returns [(string, fav_count, retweet_count, timestamp), (), ...]
 def twittertest():
     # https://stackoverflow.com/questions/33308634/how-to-perform-oauth-when-doing-twitter-scraping-with-python-requests
     # https://github.com/requests/requests-oauthlib
@@ -22,24 +25,38 @@ def twittertest():
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     auth_req = requests.get(url, auth=auth)
 
-    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=popular&tweet_mode=extended', auth=auth)
+    r = requests.get('https://api.twitter.com/1.1/search/tweets.json?q=nasa&result_type=recent&tweet_mode=extended&lang=en', auth=auth)
 
     js = r.json()
 
     result = []
 
     for stuff in js['statuses']:
-        if stuff['lang'] == 'en':
+        # get rid of the https
+        clean_string = re.sub(r'http(.*)', ' ', stuff['full_text'])
 
-            # get rid of the https
-            clean_string = re.sub(r'http(.*)', ' ', stuff['full_text'])
+        # get rid of emojis
+        clean_string = clean_string.encode('ascii', 'ignore').decode('ascii')
 
-            # get rid of emojis
-            clean_string = clean_string.encode('ascii', 'ignore').decode('ascii')
+        timestamp = datetime.strptime(stuff['created_at'], '%a %b %d %H:%M:%S %z %Y')
 
-            result.append((clean_string, stuff['favorite_count'], stuff['retweet_count']))
+        result.append((clean_string,
+                       stuff['favorite_count'],
+                       stuff['retweet_count'],
+                       timestamp))
+
+        print(clean_string)
+        print(timestamp)
+        print(change_timezone(timestamp))
+
+        print()
 
     return result
+
+
+# converts from one timezone to another timezone (default = Seattle, US west coast)
+def change_timezone(timestamp, dest_timezone="US/Pacific"):
+    return timestamp.astimezone(timezone(dest_timezone))
 
 
 def print_result(annotations):
