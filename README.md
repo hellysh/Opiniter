@@ -1,4 +1,4 @@
-# OPINIONRATED
+# OPINIORATED
 DefHacks Project: Real-time opinion analysis.
 [Demo](https://vimeo.com/336904399)
 
